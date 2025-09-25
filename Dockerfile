@@ -1,15 +1,21 @@
-FROM ghcr.io/adoptium/temurin17:17-jdk
+# Usa Ubuntu 22.04 como base
+FROM ubuntu:22.04
 
-# Directorio de trabajo
-WORKDIR /app
+# Evita preguntas interactivas al instalar paquetes
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Copiar JAR y wait-for-it.sh
-COPY build/libs/*.jar /app/app.jar
-COPY wait-for-it.sh /app/wait-for-it.sh
-RUN chmod +x /app/wait-for-it.sh
+# Copia el archivo tar.gz de Java al contenedor
+COPY openjdk-17.tar.gz /tmp/
 
-# Exponer puerto
-EXPOSE 8080
+# Instala dependencias necesarias y descomprime el JDK
+RUN apt-get update && \
+    apt-get install -y tar curl && \
+    tar -xzf /tmp/openjdk-17.tar.gz -C /opt/ && \
+    rm /tmp/openjdk-17.tar.gz
 
-# Entrypoint usando wait-for-it.sh para esperar PostgreSQL
-ENTRYPOINT ["/app/wait-for-it.sh", "postgres_db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "/app/app.jar"]
+# Define variables de entorno
+ENV JAVA_HOME=/opt/jdk-17
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Verifica la instalación (opcional)
+RUN java -version
