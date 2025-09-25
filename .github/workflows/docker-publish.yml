@@ -17,9 +17,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Configurar Buildx para Docker
+      # 2. Configurar Buildx usando driver docker-container
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
 
       # 3. Configurar Java y construir el JAR
       - name: Set up Java
