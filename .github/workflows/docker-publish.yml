@@ -1,8 +1,8 @@
 # ===========================================================
 # Workflow: Build and Push Docker image
 # -----------------------------------------------------------
-# Este flujo se ejecuta automáticamente en GitHub Actions
-# cada vez que haces un push en las ramas:
+# Se ejecuta automáticamente en GitHub Actions
+# al hacer push en las ramas:
 #   - main
 #   - develop
 #   - test
@@ -47,4 +47,5 @@ jobs:
         with:
           context: .
           push: true
-          # No usamos tags adicionales
+          # Tag obligatorio para poder hacer push
+          tags: ghcr.io/${{ github.repository }}/api-rest-java:${{ github.ref_name }}
