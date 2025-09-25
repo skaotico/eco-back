@@ -1,16 +1,4 @@
-# ===========================================================
-# Workflow: Build and Push Docker image
-# -----------------------------------------------------------
-# Se ejecuta automáticamente en GitHub Actions
-# al hacer push en las ramas:
-#   - main
-#   - develop
-#   - test
-#
-# También se puede ejecutar manualmente desde GitHub UI.
-# ===========================================================
-
-name: Build and Push Docker image
+name: Build and Publish Docker Image
 
 on:
   push:
@@ -21,31 +9,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read      # Para leer el código fuente
-      packages: write     # Para subir imágenes a GHCR
-
     steps:
-      # 1. Descargar el código del repositorio
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Login en GitHub Container Registry (ghcr.io)
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # 3. Construcción y publicación de la imagen
-      - name: Build and Push API image
+      - name: Build and Push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          # Tag obligatorio para poder hacer push
-          tags: ghcr.io/${{ github.repository }}/api-rest-java:${{ github.ref_name }}
+          tags: dockerhub-usuario/api-rest-java:${{ github.ref_name }}
+          file: ./Dockerfile
+
+      - name: Tag latest for main
+        if: github.ref_name == 'main'
+        run: |
+          docker tag dockerhub-usuario/api-rest-java:main dockerhub-usuario/api-rest-java:latest
+          docker push dockerhub-usuario/api-rest-java:latest

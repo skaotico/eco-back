@@ -1,21 +1,23 @@
-# Usa Ubuntu 22.04 como base
-FROM ubuntu:22.04
+# ===========================================================
+# Dockerfile simplificado usando OpenJDK oficial
+# ===========================================================
+
+# Usa OpenJDK 17 oficial como base (Ubuntu + JDK incluido)
+FROM openjdk:17-jdk
 
 # Evita preguntas interactivas al instalar paquetes
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Copia el archivo tar.gz de Java al contenedor
-COPY openjdk-17.tar.gz /tmp/
+# Copia tu aplicación (ajusta según tu proyecto)
+COPY . /app
+WORKDIR /app
 
-# Instala dependencias necesarias y descomprime el JDK
-RUN apt-get update && \
-    apt-get install -y tar curl && \
-    tar -xzf /tmp/openjdk-17.tar.gz -C /opt/ && \
-    rm /tmp/openjdk-17.tar.gz
+# Opcional: compilar si es necesario (Gradle/Maven)
+# RUN ./gradlew build
 
-# Define variables de entorno
-ENV JAVA_HOME=/opt/jdk-17
+# Define JAVA_HOME (ya viene configurado, pero por claridad)
+ENV JAVA_HOME=/usr/local/openjdk-17
 ENV PATH=$JAVA_HOME/bin:$PATH
 
-# Verifica la instalación (opcional)
-RUN java -version
+# Comando por defecto al iniciar el contenedor
+CMD ["java", "-jar", "tu-aplicacion.jar"]
