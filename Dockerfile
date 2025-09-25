@@ -1,23 +1,16 @@
 # ===========================================================
-# Dockerfile simplificado usando OpenJDK oficial
+# Dockerfile para aplicación Java (OpenJDK 17)
 # ===========================================================
 
-# Usa OpenJDK 17 oficial como base (Ubuntu + JDK incluido)
+# Usa la imagen oficial de OpenJDK 17
 FROM openjdk:17-jdk
 
-# Evita preguntas interactivas al instalar paquetes
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Copia tu aplicación (ajusta según tu proyecto)
-COPY . /app
+# Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Opcional: compilar si es necesario (Gradle/Maven)
-# RUN ./gradlew build
+# Copia solo el JAR compilado al contenedor
+# Ajusta la ruta según tu proyecto (Gradle: build/libs/*.jar, Maven: target/*.jar)
+COPY build/libs/mi-aplicacion.jar /app/mi-aplicacion.jar
 
-# Define JAVA_HOME (ya viene configurado, pero por claridad)
-ENV JAVA_HOME=/usr/local/openjdk-17
-ENV PATH=$JAVA_HOME/bin:$PATH
-
-# Comando por defecto al iniciar el contenedor
-CMD ["java", "-jar", "tu-aplicacion.jar"]
+# Define el comando por defecto al iniciar el contenedor
+CMD ["java", "-jar", "mi-aplicacion.jar"]
