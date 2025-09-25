@@ -1,0 +1,74 @@
+version: '3.9'
+
+###########################################################
+# DOCKER COMPOSE: PostgreSQL + MinIO + API Java
+###########################################################
+services:
+  ###########################################################
+  # Servicio de Base de Datos PostgreSQL
+  ###########################################################
+  postgres_db:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: tutor
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - api-network
+
+  ###########################################################
+  # Servicio de MinIO (Almacenamiento de objetos tipo S3)
+  ###########################################################
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"   # API S3
+      - "9001:9001"   # Consola Web de MinIO
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_REGION: us-east-1
+      MINIO_BROWSER: "on"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - api-network
+
+  ###########################################################
+  # Servicio de API REST en Java (Spring Boot, por ejemplo)
+  ###########################################################
+  api-rest-java:
+    build: .  # O reemplaza por 'image: ghcr.io/usuario/api-rest-java:latest' en producción
+    container_name: api-rest-java
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres_db
+      - minio
+    environment:
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: docker
+      # Configuración de MinIO
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_USER: minioadmin
+      MINIO_PASS: minioadmin
+    networks:
+      - api-network
+
+###########################################################
+# Volúmenes persistentes
+###########################################################
+volumes:
+  minio-data:
+
+###########################################################
+# Red de comunicación interna
+###########################################################
+networks:
+  api-network:
+    driver: bridge
