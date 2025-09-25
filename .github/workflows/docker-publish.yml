@@ -3,11 +3,11 @@
 # -----------------------------------------------------------
 # Este flujo se ejecuta automáticamente en GitHub Actions
 # cada vez que haces un push en las ramas:
-#   - main    → genera las imágenes :main y :latest
-#   - develop → genera la imagen :develop
-#   - test    → genera la imagen :test
+#   - main
+#   - develop
+#   - test
 #
-# Además, se puede ejecutar manualmente desde GitHub UI.
+# También se puede ejecutar manualmente desde GitHub UI.
 # ===========================================================
 
 name: Build and Push Docker image
@@ -15,21 +15,21 @@ name: Build and Push Docker image
 on:
   push:
     branches:
-      - main      # Rama principal → producción
-      - develop   # Rama de desarrollo
-      - test      # Rama de pruebas
-  workflow_dispatch: # Permite lanzarlo manualmente
+      - main
+      - develop
+      - test
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read   # Para leer el código fuente
-      packages: write  # Para subir imágenes a GHCR
+      contents: read      # Para leer el código fuente
+      packages: write     # Para subir imágenes a GHCR
 
     steps:
-      # 1. Descarga el código del repositorio
+      # 1. Descargar el código del repositorio
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -45,11 +45,6 @@ jobs:
       - name: Build and Push API image
         uses: docker/build-push-action@v5
         with:
-          context: .      # Usa el Dockerfile en la raíz del repo
-          push: true      # Empuja la imagen a GHCR
-          tags: |
-            # Tag dinámico según la rama (main, develop, test)
-            ghcr.io/${{ github.repository }}/api-rest-java:${{ github.ref_name }}
-
-            # Tag adicional "latest" solo si es la rama main
-            ${{ github.ref_name == 'main' && format('ghcr.io/{0}/api-rest-java:latest', github.repository) || '' }}
+          context: .
+          push: true
+          # No usamos tags adicionales
