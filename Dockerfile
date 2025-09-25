@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk
+FROM ghcr.io/adoptium/temurin17:17-jdk
 
 # Directorio de trabajo
 WORKDIR /app
