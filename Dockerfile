@@ -1,5 +1,4 @@
-# Imagen base con JDK completo desde GHCR (Temurin 17)
-FROM ghcr.io/adoptium/temurin17-jdk:latest
+FROM eclipse-temurin:17-jdk
 
 # Directorio de trabajo
 WORKDIR /app
