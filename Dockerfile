@@ -1,5 +1,5 @@
-# Imagen base con JDK completo
-FROM openjdk:17-jdk
+# Imagen base con JDK completo (Eclipse Temurin 17)
+FROM eclipse-temurin:17-jdk
 
 # Directorio de trabajo
 WORKDIR /app
