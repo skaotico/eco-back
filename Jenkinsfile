@@ -59,7 +59,7 @@ pipeline {
             }
         }
 
-        stage('Verify Services') {
+       stage('Verify Services') {
             steps {
                 echo "Verificando contenedores en ejecución..."
                 sh """
