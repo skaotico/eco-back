@@ -71,6 +71,7 @@ pipeline {
         }
     }
 
+
     post {
         success {
             echo "Stack levantado correctamente en Docker local."
