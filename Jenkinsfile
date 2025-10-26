@@ -21,18 +21,19 @@ pipeline {
             }
         }
 
-        stage('Build & Up with Docker Compose') {
-            steps {
-                echo 'Construyendo imágenes y levantando contenedores locales...'
-                sh '''
-                    echo "Eliminando servicios anteriores (si existen)..."
-                    docker compose down -v || true
+      stage('Build & Up with Docker Compose') {
+          steps {
+              echo 'Construyendo imágenes y levantando contenedores locales...'
+              sh '''
+                  echo "Eliminando servicios anteriores (si existen)..."
+                  docker-compose down -v || true
 
-                    echo "Levantando servicios con build..."
-                    docker compose up --build -d
-                '''
-            }
-        }
+                  echo "Levantando servicios con build..."
+                  docker-compose up --build -d
+              '''
+          }
+      }
+
 
         stage('Verify Services') {
             steps {
