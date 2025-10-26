@@ -1,16 +1,11 @@
-# ===========================================================
-# Dockerfile para aplicación Java (OpenJDK 17)
-# ===========================================================
+# Etapa 1: compilar con Gradle
+FROM gradle:8.5-jdk17 AS builder
+WORKDIR /home/gradle/project
+COPY . .
+RUN gradle clean build -x test
 
-# Usa la imagen oficial de OpenJDK 17
+# Etapa 2: solo runtime con OpenJDK
 FROM openjdk:17-jdk
-
-# Directorio de trabajo dentro del contenedor
 WORKDIR /app
-
-# Copia solo el JAR compilado al contenedor
-# Ajusta la ruta según tu proyecto (Gradle: build/libs/*.jar, Maven: target/*.jar)
-COPY build/libs/mi-aplicacion.jar /app/mi-aplicacion.jar
-
-# Define el comando por defecto al iniciar el contenedor
-CMD ["java", "-jar", "mi-aplicacion.jar"]
+COPY --from=builder /home/gradle/project/build/libs/*.jar /app/app.jar
+CMD ["java", "-jar", "app.jar"]

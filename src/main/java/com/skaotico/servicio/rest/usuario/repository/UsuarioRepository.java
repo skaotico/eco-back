@@ -1,6 +1,6 @@
 package com.skaotico.servicio.rest.usuario.repository;
 
-import com.skaotico.servicio.rest.recinto.model.Recinto;
+
 import com.skaotico.servicio.rest.usuario.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

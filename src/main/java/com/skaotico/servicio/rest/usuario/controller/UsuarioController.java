@@ -1,6 +1,7 @@
 package com.skaotico.servicio.rest.usuario.controller;
 
 import com.skaotico.servicio.rest.common.dto.ApiResponseGeneric;
+import com.skaotico.servicio.rest.common.factory.ResponseFactory;
 import com.skaotico.servicio.rest.usuario.dto.UsuarioCreateDTO;
 import com.skaotico.servicio.rest.usuario.model.Usuario;
 import com.skaotico.servicio.rest.usuario.service.UsuarioService;
@@ -9,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,15 +20,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import jakarta.validation.Valid;
+
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlador REST para la gestión de Usuarios.
- *
- * <p>Proporciona endpoints para crear, consultar, listar usuarios y subir imágenes.</p>
- *
- * <p>Todos los endpoints retornan {@link ApiResponseGeneric} para estandarizar las respuestas.</p>
  */
 @RestController
 @RequestMapping("/usuario")
@@ -42,10 +42,18 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponseGeneric<Usuario>> create(@Valid @RequestBody UsuarioCreateDTO usuarioDto) {
-        Usuario usuarioCreado = usuarioService.crearUsuario(usuarioDto);
-        return ResponseEntity.status(201)
-                .body(new ApiResponseGeneric<>(true, usuarioCreado, "Usuario creado correctamente"));
+    public ResponseEntity<ApiResponseGeneric<Usuario>> create(
+            @Valid @RequestBody UsuarioCreateDTO usuarioDto,
+            HttpServletRequest request) {
+
+        try {
+            Usuario usuarioCreado = usuarioService.crearUsuario(usuarioDto);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ResponseFactory.ok(usuarioCreado, "Usuario creado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ResponseFactory.error("Error al crear usuario: " + e.getMessage(), request, "CREATE_USER_ERROR"));
+        }
     }
 
     @GetMapping
@@ -54,9 +62,14 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida correctamente")
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponseGeneric<List<Usuario>>> findAll() {
-        List<Usuario> usuarios = usuarioService.listarTodosUsuarios();
-        return ResponseEntity.ok(new ApiResponseGeneric<>(true, usuarios, "Usuarios obtenidos correctamente"));
+    public ResponseEntity<ApiResponseGeneric<List<Usuario>>> findAll(HttpServletRequest request) {
+        try {
+            List<Usuario> usuarios = usuarioService.listarTodosUsuarios();
+            return ResponseEntity.ok(ResponseFactory.ok(usuarios, "Usuarios obtenidos correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseFactory.error("Error al obtener usuarios: " + e.getMessage(), request, "LIST_USERS_ERROR"));
+        }
     }
 
     @GetMapping("/{id}")
@@ -66,9 +79,11 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponseGeneric<Usuario>> findOne(@PathVariable Long id) {
-        Usuario usuario = usuarioService.obtenerUsuarioPorId(id);
-        return ResponseEntity.ok(new ApiResponseGeneric<>(true, usuario, "Usuario encontrado"));
+    public ResponseEntity<ApiResponseGeneric<Usuario>> findOne(@PathVariable Long id, HttpServletRequest request) {
+
+
+            return ResponseEntity.ok(ResponseFactory.ok(usuarioService.obtenerUsuarioPorId(id), "Usuario encontrado"));
+
     }
 
     @PostMapping(value = "/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -81,19 +96,20 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponseGeneric<Usuario>> subirImagen(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestPart(name = "file", required = true) MultipartFile file) {
+            @RequestPart(name = "file", required = true) MultipartFile file,
+            HttpServletRequest request) {
 
         if (file.isEmpty()) {
             return ResponseEntity.badRequest()
-                    .body(new ApiResponseGeneric<>(false, null, "No se recibió ningún archivo"));
+                    .body(ResponseFactory.error("No se recibió ningún archivo", request, "FILE_EMPTY"));
         }
 
         try {
             Usuario usuario = usuarioService.guardarImagenUsuario(file, jwt);
-            return ResponseEntity.ok(new ApiResponseGeneric<>(true, usuario, "Usuario modificado correctamente"));
+            return ResponseEntity.ok(ResponseFactory.ok(usuario, "Imagen subida correctamente"));
         } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body(new ApiResponseGeneric<>(false, null, "Ocurrió un error al subir la imagen: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseFactory.error("Ocurrió un error al subir la imagen: " + e.getMessage(), request, "UPLOAD_IMAGE_ERROR"));
         }
     }
 
@@ -104,25 +120,34 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponseGeneric<Usuario>> getUsuarioActual(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<ApiResponseGeneric<Usuario>> getUsuarioActual(
+            @AuthenticationPrincipal Jwt jwt,
+            HttpServletRequest request) {
 
         Usuario usuario = usuarioService.obtenerUsuarioPorEmail(jwt);
 
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseGeneric<>(false, null, "Usuario no encontrado"));
+                    .body(ResponseFactory.error("Usuario no encontrado", request, "USER_NOT_FOUND"));
         }
 
-        return ResponseEntity.ok(new ApiResponseGeneric<>(true, usuario, "Usuario encontrado"));
+        return ResponseEntity.ok(ResponseFactory.ok(usuario, "Usuario actual obtenido correctamente"));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarUsuario(@PathVariable Long id) {
+    @Operation(summary = "Eliminar un usuario por ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario eliminado correctamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<ApiResponseGeneric<String>> eliminarUsuario(@PathVariable Long id, HttpServletRequest request) {
         try {
             usuarioService.eliminarUsuario(id);
-            return ResponseEntity.ok("Usuario eliminado correctamente");
+            return ResponseEntity.ok(ResponseFactory.ok("Usuario eliminado correctamente", "Operación exitosa"));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ResponseFactory.error(e.getMessage(), request, "DELETE_USER_ERROR"));
         }
     }
 }

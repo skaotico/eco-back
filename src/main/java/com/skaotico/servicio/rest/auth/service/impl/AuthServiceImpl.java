@@ -5,13 +5,21 @@ import com.skaotico.servicio.rest.auth.dto.LoginDto;
 import com.skaotico.servicio.rest.auth.dto.LoginResponseDto;
 import com.skaotico.servicio.rest.auth.service.AuthService;
 
+import com.skaotico.servicio.rest.rol.service.RolService;
 import com.skaotico.servicio.rest.usuario.model.Usuario;
 
 import com.skaotico.servicio.rest.usuario.service.UsuarioService;
+import com.skaotico.servicio.rest.usuarioRol.dto.UsuarioRolResponseDto;
+import com.skaotico.servicio.rest.usuarioRol.service.UsuarioRolService;
 import com.skaotico.servicio.rest.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Servicio de autenticación que se encarga del login de usuarios y generación de JWT.
@@ -19,14 +27,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthServiceImpl implements AuthService  {
 
-    @Autowired
-    private UsuarioService usuarioService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final UsuarioService usuarioService;
+    private final JwtUtil jwtUtil;
+    private final  BCryptPasswordEncoder passwordEncoder;
+    private final UsuarioRolService usuarioRolService;
+    private final RolService rolService;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public AuthServiceImpl(UsuarioService usuarioService, JwtUtil jwtUtil, BCryptPasswordEncoder passwordEncoder, UsuarioRolService usuarioRolService, RolService rolService) {
+        this.usuarioService = usuarioService;
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
+        this.usuarioRolService = usuarioRolService;
+        this.rolService = rolService;
+    }
+
 
     /**
      * Autentica a un usuario en el sistema mediante sus credenciales.
@@ -47,16 +62,26 @@ public class AuthServiceImpl implements AuthService  {
      */
     public AuthResponseDto login(LoginDto loginDto) {
 
+        List<String> lstRoles = null;
         Usuario usuario = usuarioService.obtenerUsuarioPorEmail(loginDto.getEmail());
-        System.out.println("usuario encontrado " + usuario);
+
 
         if (!passwordEncoder.matches(loginDto.getPassword(), usuario.getPassword())) {
             throw new RuntimeException("Credenciales incorrectas");
         }
 
+        List<UsuarioRolResponseDto> lstRolesUsuario = usuarioRolService.getRolPorUsuarioID(usuario.getId());
+
+        String[] nombresRoles = Optional.ofNullable(lstRolesUsuario)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(ur -> rolService.obtenerRolPorId(ur.getRolId()).getNombre().name())
+                .toArray(String[]::new);
+
+
         String token = jwtUtil.generateToken(usuario);
 
-
+        System.out.println(Arrays.toString(nombresRoles));
 
         return AuthResponseDto.builder()
                 .token(token)

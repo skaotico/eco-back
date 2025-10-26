@@ -13,9 +13,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -25,7 +27,6 @@ public class SecurityConfig {
     public SecurityConfig(@Qualifier("jwtDecoderBean") JwtDecoder jwtDecoder) {
         this.jwtDecoder = jwtDecoder;
     }
-
 
     private final AuthenticationEntryPoint jwtAuthenticationEntryPoint = new AuthenticationEntryPoint() {
         private final ObjectMapper objectMapper = new ObjectMapper();
@@ -40,7 +41,10 @@ public class SecurityConfig {
                     null,
                     "Autenticacion fallida: token JWT invalido o no proporcionado | Path: "
                             + request.getRequestURI()
-                            + " | Timestamp: " + Instant.now()
+                            + " | Timestamp: " + Instant.now(),
+                    null,
+                    null,
+                    null
             );
 
             response.setContentType("application/json");
@@ -53,13 +57,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration corsConfig = new CorsConfiguration();
+                    corsConfig.setAllowedOriginPatterns(List.of("http://localhost:*", "http://192.168.1.3:*"));
+                    corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfig.setAllowedHeaders(List.of("*"));
+                    corsConfig.setAllowCredentials(true);
+                    return corsConfig;
+                }))
                 .authorizeHttpRequests(auth -> auth
                         // Permitir acceso público a Swagger
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario").permitAll()
-                        .requestMatchers("/usuario/**").authenticated()
-                        .requestMatchers("/arbol/**").authenticated()
-                        // Otros endpoints abiertos
+                        .requestMatchers("/usuario/**", "/arbol/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

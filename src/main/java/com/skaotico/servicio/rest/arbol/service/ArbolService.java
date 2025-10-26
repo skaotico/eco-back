@@ -2,7 +2,7 @@ package com.skaotico.servicio.rest.arbol.service;
 
 import com.skaotico.servicio.rest.arbol.dto.ArbolCreateDto;
 import com.skaotico.servicio.rest.arbol.dto.ArbolResponseDto;
-import com.skaotico.servicio.rest.arbol.dto.ImagenResponse;
+import com.skaotico.servicio.rest.arbol.dto.ImagenResponseDto;
 import com.skaotico.servicio.rest.arbol.model.ArbolModel;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.multipart.MultipartFile;
@@ -74,10 +74,10 @@ public interface ArbolService {
      * Puede lanzar excepciones si ocurre un error durante el almacenamiento.</p>
      *
      * @param file archivo de imagen del árbol (obligatorio)
-     * @return {@link ImagenResponse} con la información de la imagen almacenada
+     * @return {@link ImagenResponseDto} con la información de la imagen almacenada
      * @throws Exception si hay error al guardar la imagen
      */
-    ImagenResponse guardarImagen(MultipartFile file) throws Exception;
+    ImagenResponseDto guardarImagen(MultipartFile file) throws Exception;
 
     /**
      * Crea un nuevo árbol en la base de datos.
@@ -106,7 +106,7 @@ public interface ArbolService {
      * @param id identificador del árbol a buscar (obligatorio)
      * @return {@link Optional} con el árbol encontrado o vacío si no existe
      */
-    Optional<ArbolModel> buscarPorId(Long id);
+    Optional<ArbolResponseDto> buscarPorId(Long id);
 
     /**
      * Lista todos los árboles registrados en el sistema.

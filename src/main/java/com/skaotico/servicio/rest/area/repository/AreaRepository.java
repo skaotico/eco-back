@@ -10,4 +10,5 @@ import java.util.List;
 public interface AreaRepository extends JpaRepository<Area, Long> {
     List<Area> findByRecintoId(Long recintoId);
     List<Area> findByRecintoIdIn(List<Long> recintoIds);
+
 }

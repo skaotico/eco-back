@@ -1,7 +1,11 @@
 package com.skaotico.servicio.rest.rol.controller;
 
-import com.skaotico.servicio.rest.rol.dto.RolDTO;
-import com.skaotico.servicio.rest.rol.model.RolModel;
+import com.skaotico.servicio.rest.common.dto.ApiResponseGeneric;
+import com.skaotico.servicio.rest.common.factory.ResponseFactory;
+
+import com.skaotico.servicio.rest.rol.dto.RolRequestDto;
+import com.skaotico.servicio.rest.rol.dto.RolResponseDto;
+
 import com.skaotico.servicio.rest.rol.service.RolService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,43 +29,37 @@ public class RolController {
 
     @GetMapping("/listar")
     @Operation(summary = "Obtener todos los roles")
-    public ResponseEntity<List<RolModel>> listarRoles() {
-        List<RolModel> lstRoles = this.rolService.obtenerTodosLosRoles();
-        return ResponseEntity.ok(lstRoles);
+    public ResponseEntity<ApiResponseGeneric<List<RolResponseDto>>> listarRoles() {
+        return ResponseEntity.ok(ResponseFactory.ok(this.rolService.obtenerTodosLosRoles(), "Roles obtenidos correctamente"));
+
     }
 
     @PostMapping
     @Operation(summary = "Crear un nuevo rol")
-    public ResponseEntity<RolModel> crearRol(@Valid @RequestBody RolDTO rolDTO) {
-        RolModel nuevoRol = rolService.crearRol(rolDTO);
-        return ResponseEntity.ok(nuevoRol);
+    public ResponseEntity<ApiResponseGeneric<RolResponseDto>> crearRol(@Valid @RequestBody RolRequestDto rolRequestDto) {
+        return ResponseEntity.ok(ResponseFactory.ok(rolService.crearRol(rolRequestDto), "Rol creado correctamente"));
     }
 
     @Operation(summary = "Obtener un rol por su ID")
     @GetMapping("/{id}")
-    public ResponseEntity<RolModel> obtenerRolPorId(@PathVariable Long id) {
-        Optional<RolModel> rol = rolService.obtenerRolPorId(id);
-        return rol.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponseGeneric<RolResponseDto>> obtenerRolPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(ResponseFactory.ok(rolService.obtenerRolPorId(id), "Rol creado correctamente"));
+
     }
 
     @Operation(summary = "Obtener un rol por su nombre")
     @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<RolModel> obtenerRolPorNombre(@PathVariable String nombre) {
-        Optional<RolModel> rol = rolService.obtenerRolPorNombre(nombre);
-        return rol.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponseGeneric<RolResponseDto>> obtenerRolPorNombre(@PathVariable String nombre) {
+        return ResponseEntity.ok(ResponseFactory.ok(rolService.obtenerRolPorNombre(nombre), " "));
+
+
     }
 
     @Operation(summary = "Eliminar un rol por su ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarRol(@PathVariable Long id) {
-        try {
-            rolService.eliminarRol(id);
-            return ResponseEntity.ok("Rol eliminado correctamente");
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ApiResponseGeneric<Boolean>> eliminarRol(@PathVariable Long id) {
+        return ResponseEntity.ok(ResponseFactory.ok(rolService.eliminarRol(id) , " "));
+
     }
 
     @PutMapping("/{id}")
@@ -73,13 +71,8 @@ public class RolController {
             @ApiResponse(responseCode = "200", description = "Rol actualizado correctamente"),
             @ApiResponse(responseCode = "404", description = "Rol no encontrado")
     })
-    public ResponseEntity<RolModel> actualizarRol(@PathVariable Long id, @RequestBody @Valid RolDTO rolDTO) {
-        try {
-            RolModel rolActualizado = rolService.actualizarRol(id, rolDTO);
+    public ResponseEntity<ApiResponseGeneric<RolResponseDto>> actualizarRol(@PathVariable Long id, @RequestBody @Valid RolRequestDto rolRequestDto) {
+        return ResponseEntity.ok(ResponseFactory.ok(rolService.actualizarRol(id, rolRequestDto) , " "));
 
-            return ResponseEntity.ok(rolActualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
     }
 }

@@ -58,5 +58,5 @@ public interface MinioService {
 
     public String getFileUrl(String bucket, String objectPath)throws Exception;
 
-    public byte[] getFileBytes(String bucket, String objectPath) throws Exception;
+    public byte[] getFileBytes(String bucket, String objectPath) throws Excep   tion;
 }

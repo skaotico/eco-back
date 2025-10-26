@@ -14,9 +14,12 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOriginPatterns("http://localhost:*") // permite cualquier puerto en localhost
+                        .allowedOriginPatterns(
+                                "http://localhost:*",
+                                "http://192.168.1.3:*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowCredentials(true); // ahora sí funciona con credenciales
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }

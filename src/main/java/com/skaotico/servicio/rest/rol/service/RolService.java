@@ -1,6 +1,8 @@
 package com.skaotico.servicio.rest.rol.service;
 
-import com.skaotico.servicio.rest.rol.dto.RolDTO;
+
+import com.skaotico.servicio.rest.rol.dto.RolRequestDto;
+import com.skaotico.servicio.rest.rol.dto.RolResponseDto;
 import com.skaotico.servicio.rest.rol.model.RolModel;
 
 import java.util.List;
@@ -8,15 +10,15 @@ import java.util.Optional;
 
 public interface RolService {
 
-    RolModel crearRol(RolDTO rolDTO);
+    RolResponseDto crearRol(RolRequestDto rolRequestDto);
 
-    RolModel actualizarRol(Long id, RolDTO rolDTO);
+    RolResponseDto actualizarRol(Long id, RolRequestDto rolRequestDto);
 
-    void eliminarRol(Long id);
+    boolean eliminarRol(Long id);
 
-    Optional<RolModel> obtenerRolPorId(Long id);
+    RolResponseDto  obtenerRolPorId(Long id);
 
-    Optional<RolModel> obtenerRolPorNombre(String nombre);
+    RolResponseDto obtenerRolPorNombre(String nombre);
 
-    List<RolModel> obtenerTodosLosRoles();
+    List<RolResponseDto> obtenerTodosLosRoles();
 }

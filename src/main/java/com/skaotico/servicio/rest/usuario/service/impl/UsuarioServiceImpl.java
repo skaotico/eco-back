@@ -1,7 +1,5 @@
 package com.skaotico.servicio.rest.usuario.service.impl;
 
-import com.skaotico.servicio.rest.arbol.dto.ImagenResponse;
-import com.skaotico.servicio.rest.rol.model.RolUsuarioEnum;
 import com.skaotico.servicio.rest.storage.minio.MinioService;
 import com.skaotico.servicio.rest.usuario.dto.UsuarioCreateDTO;
 import com.skaotico.servicio.rest.usuario.mapper.UsuarioMapper;
@@ -9,7 +7,6 @@ import com.skaotico.servicio.rest.usuario.model.Usuario;
 import com.skaotico.servicio.rest.usuario.repository.UsuarioRepository;
 import com.skaotico.servicio.rest.usuario.service.UsuarioService;
 import org.springframework.security.oauth2.jwt.Jwt;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

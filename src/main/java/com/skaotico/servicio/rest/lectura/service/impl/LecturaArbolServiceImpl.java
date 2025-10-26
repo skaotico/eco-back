@@ -55,6 +55,7 @@ public class LecturaArbolServiceImpl implements LecturaArbolService {
         Pageable pageable = PageRequest.of(page, size);
         return repository.findAll(pageable);
     }
+
     @Override
 
     public LecturaArbol obtenerPorId(Long id) {

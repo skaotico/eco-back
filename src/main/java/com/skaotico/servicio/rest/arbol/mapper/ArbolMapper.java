@@ -10,6 +10,8 @@ import com.skaotico.servicio.rest.area.model.Area;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -100,5 +102,21 @@ public interface ArbolMapper {
 
     @Mapping(source = "area.id", target = "areaId")
     ArbolResponseDto toResponseDto(ArbolModel arbol);
+
+    /**
+     * Convierte una lista de {@link ArbolCreateDto} en una lista de {@link ArbolModel}.
+     *
+     * @param dtos Lista de DTOs de creación de árboles.
+     * @return Lista de entidades {@link ArbolModel}.
+     */
+    List<ArbolModel> toEntityList(List<ArbolCreateDto> dtos);
+
+    /**
+     * Convierte una lista de {@link ArbolModel} en una lista de {@link ArbolResponseDto}.
+     *
+     * @param arboles Lista de entidades de árboles.
+     * @return Lista de DTOs de respuesta.
+     */
+    List<ArbolResponseDto> toResponseDtoList(List<ArbolModel> arboles);
 
 }

@@ -8,17 +8,19 @@ import java.util.List;
 
 public interface AreaService {
 
-    AreaDto createArea(CreateAreaDTO createAreaDTO);
+    CreateAreaDTO createArea(CreateAreaDTO createAreaDTO);
 
-    AreaDto getAreaById(Long id);
+    CreateAreaDTO getAreaById(Long id);
 
-    List<AreaDto> getAllAreas();
+    List<CreateAreaDTO> getAllAreas();
 
-    AreaDto updateArea(Long id, AreaDto areaDto);
+    CreateAreaDTO updateArea(Long id, AreaDto areaDto);
 
     void deleteArea(Long id);
 
     List<Area> obtenerAreasPorRecinto(List<Long> recintoIds);
+
+    List<CreateAreaDTO> findByRecintoId(Long recintoId);
 
 
 }

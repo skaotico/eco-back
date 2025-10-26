@@ -1,6 +1,6 @@
 package com.skaotico.servicio.rest.rol.model;
 
-import com.skaotico.servicio.rest.rol.dto.RolDTO;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,17 +40,5 @@ public class RolModel {
     private String descripcion;
 
 
-    /**
-     * Convierte un RolDTO en RolModel.
-     */
-    public static RolModel fromDTO(RolDTO dto) {
-        if (dto == null) {
-            return null;
-        }
 
-        return RolModel.builder()
-                .nombre(dto.getNombre())
-                .descripcion(dto.getDescripcion())
-                .build();
-    }
 }

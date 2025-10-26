@@ -243,3 +243,26 @@ CREATE TABLE arbolesNativo (
     creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
+-- =====================================================
+-- Tabla: esp32_device
+-- Descripción: Dispositivos ESP32 registrados en el sistema.
+-- Se utiliza para mapear los dispositivos, identificar su hardware y estado de conexión.
+-- =====================================================
+CREATE TABLE esp32_device (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    mac VARCHAR(17) NOT NULL UNIQUE,         -- Dirección MAC del ESP32
+    chip_id VARCHAR(20) NOT NULL UNIQUE,     -- Chip ID único
+    model VARCHAR(50) NOT NULL,              -- Modelo del dispositivo (ej. ESP32)
+    cores SMALLINT NOT NULL,                 -- Número de núcleos
+    revision SMALLINT NOT NULL,              -- Revisión del chip
+    flash BIGINT NOT NULL,                   -- Tamaño de flash en bytes
+    sdk VARCHAR(20) NOT NULL,                -- Versión del SDK
+    ip INET,                                 -- IP asignada
+    rssi SMALLINT,                           -- Intensidad de señal WiFi
+    uptime BIGINT,                            -- Tiempo activo desde último reset (segundos)
+    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Última vez que se reportó online
+    creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

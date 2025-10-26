@@ -11,7 +11,7 @@ public class FcmServiceImpl implements FcmService {
 
     @Override
     public String enviarATodos(String titulo, String cuerpo) throws Exception {
-        // Construimos el mensaje para el topic "todos"
+
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(titulo)

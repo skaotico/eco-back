@@ -26,7 +26,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 null,
                 "Autenticación fallida: token JWT inválido o no proporcionado | Path: "
                         + request.getRequestURI()
-                        + " | Timestamp: " + Instant.now()
+                        + " | Timestamp: " + Instant.now(),null,null,null
         );
 
         response.setContentType("application/json");

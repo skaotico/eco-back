@@ -5,13 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.skaotico.servicio.rest.area.dto.AreaDto;
+import com.skaotico.servicio.rest.area.dto.CreateAreaDTO;
 import com.skaotico.servicio.rest.area.model.Area;
 import com.skaotico.servicio.rest.area.service.AreaService;
-import com.skaotico.servicio.rest.recinto.recinto.dto.AccesoRecintoResponseDto;
-import com.skaotico.servicio.rest.recinto.recinto.service.AccesoRecintoService;
+import com.skaotico.servicio.rest.accesoRecinto.dto.AccesoRecintoResponseDto;
+import com.skaotico.servicio.rest.accesoRecinto.service.AccesoRecintoService;
 import com.skaotico.servicio.rest.arbol.dto.ArbolCreateDto;
 import com.skaotico.servicio.rest.arbol.dto.ArbolResponseDto;
-import com.skaotico.servicio.rest.arbol.dto.ImagenResponse;
+import com.skaotico.servicio.rest.arbol.dto.ImagenResponseDto;
 import com.skaotico.servicio.rest.arbol.mapper.ArbolMapper;
 import com.skaotico.servicio.rest.arbol.model.ArbolModel;
 import com.skaotico.servicio.rest.arbol.repository.ArbolRepository;
@@ -109,11 +110,11 @@ public class ArbolServiceImpl implements ArbolService {
      * Guarda un archivo en MinIO y devuelve información de la imagen.
      *
      * @param file Archivo a subir (obligatorio). Debe contener datos; si está vacío, lanza {@link IllegalArgumentException}.
-     * @return {@link ImagenResponse} con el nombre único y la URL pública del archivo.
+     * @return {@link ImagenResponseDto} con el nombre único y la URL pública del archivo.
      * @throws Exception si ocurre un error durante la subida al bucket.
      */
     @Override
-    public ImagenResponse guardarImagen(MultipartFile file) throws Exception {
+    public ImagenResponseDto guardarImagen(MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("El archivo está vacío");
         }
@@ -132,7 +133,7 @@ public class ArbolServiceImpl implements ArbolService {
 
         String url = minioService.getFileUrl(BUCKET, objectName);
 
-        return new ImagenResponse(objectName, url);
+        return new ImagenResponseDto(objectName, url);
     }
 
     /**
@@ -199,15 +200,11 @@ public class ArbolServiceImpl implements ArbolService {
         return false;
     }
 
-    /**
-     * Busca un árbol por su ID.
-     *
-     * @param id ID del árbol (obligatorio)
-     * @return {@link Optional} con el {@link ArbolModel} si se encontró, vacío en caso contrario.
-     */
+
     @Override
-    public Optional<ArbolModel> buscarPorId(Long id) {
-        return arbolRepository.findById(id);
+    public Optional<ArbolResponseDto> buscarPorId(Long id) {
+        return arbolRepository.findById(id)
+                .map(arbol -> arbolMapper.toResponseDto(arbol));
     }
 
     /**
