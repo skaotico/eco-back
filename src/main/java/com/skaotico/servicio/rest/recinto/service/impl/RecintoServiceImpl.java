@@ -45,6 +45,7 @@ public class RecintoServiceImpl implements RecintoService {
         return false;
     }
 
+
     @Override
     public List<RecintoResponseDTO> listarTodosRecintos() {
         return recintoRepository.findAll()
